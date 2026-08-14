@@ -1,0 +1,25 @@
+# --- core data pipeline ---
+pandas==2.2.2
+numpy==1.26.4
+python-dotenv==1.0.1
+
+# --- database ---
+SQLAlchemy==2.0.30
+psycopg2-binary==2.9.9
+
+# --- modeling (Day 4+) ---
+scikit-learn==1.4.2
+joblib==1.4.2
+
+# --- notebooks / EDA ---
+jupyter==1.0.0
+matplotlib==3.8.4
+seaborn==0.13.2
+
+# --- app layer (Day 5+) ---
+streamlit==1.35.0
+plotly==5.22.0
+google-genai==1.5.0          # used by src/insights.py (current Gemini SDK)
+
+# --- testing ---
+pytest==8.2.0
