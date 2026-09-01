@@ -40,8 +40,7 @@ def build_seller_lookup(df: pd.DataFrame) -> dict:
         .groupby("seller_id")["seller_avg_delay_historical"]
         .last()
     )
-    final_avg = df.groupby("seller_id")["delivery_delay_days"].mean()
-    return final_avg.to_dict()
+    return latest.to_dict()
 
 def main():
     print(f"Reading {IN_PATH} ...")

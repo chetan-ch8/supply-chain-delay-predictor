@@ -11,7 +11,15 @@ load_dotenv()
 def _get_secret(key: str) -> str | None:
     try:
         import streamlit as st  # imported lazily — pipeline scripts don't need Streamlit at all
-        if key in st.secrets:
+
+        # IMPORTANT: don't do `key in st.secrets` / `st.secrets[key]` as a way to
+        # "probe" for a secrets.toml file. Streamlit's Secrets._parse() calls
+        # st.error(...) and paints a banner on the page *before* raising
+        # FileNotFoundError when no secrets.toml exists anywhere - so the banner
+        # shows up even though we catch the exception right here. Streamlit
+        # provides a silent version of this exact check for local dev, so use
+        # that first.
+        if st.secrets.load_if_toml_exists() and key in st.secrets:
             return st.secrets[key]
     except (ImportError, FileNotFoundError):
         # ImportError: streamlit not installed (fine — plain scripts, tests, notebooks)
