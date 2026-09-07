@@ -70,7 +70,6 @@ def main():
 
     st.divider()
     st.caption(
-        "Live link: add your deployed Streamlit Cloud URL to the README once deployed. "
         "See the Explorer, Risk Predictor, and AI Insights pages in the sidebar."
     )
 
