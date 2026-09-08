@@ -41,8 +41,9 @@ def load_kpis() -> dict:
         "late_rate_trend": trend_desc,
     }
 
+
 def main():
-    st.title("AI Insights")
+    st.title("🤖 AI Insights")
     st.caption("Live KPIs, summarized into plain-English action items by Gemini.")
 
     try:
@@ -54,10 +55,23 @@ def main():
     with st.expander("View raw KPIs", expanded=False):
         st.json(kpis)
 
-    if st.button("Generate insights", type="primary"):
-        with st.spinner("Asking Gemini to summarize this week's KPIs..."):
+    question = st.text_input(
+        "Ask a specific question (optional)",
+        placeholder="e.g. Which state should we prioritize fixing first?",
+        help="Leave this blank for a general summary, or ask something specific about the KPIs above.",
+    )
+
+    button_label = "Answer my question" if question.strip() else "Generate insights"
+    spinner_msg = (
+        "Asking Gemini about your question..."
+        if question.strip()
+        else "Asking Gemini to summarize this week's KPIs..."
+    )
+
+    if st.button(button_label, type="primary"):
+        with st.spinner(spinner_msg):
             try:
-                result = generate_insights(kpis)
+                result = generate_insights(kpis, question=question)
             except RuntimeError as e:
                 st.error(f"Couldn't generate insights: {e}")
                 st.stop()
@@ -65,7 +79,7 @@ def main():
                 st.error(f"Gemini request failed: {e}")
                 st.stop()
 
-        st.subheader("Key Takeaways")
+        st.subheader("Answer" if question.strip() else "Key Takeaways")
         for bullet in result["bullets"]:
             st.markdown(f"- {bullet}")
 
