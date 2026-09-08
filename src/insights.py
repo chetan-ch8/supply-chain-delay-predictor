@@ -1,12 +1,9 @@
 import json
 from typing import Any
-
 from google import genai
-from google.genai import types
-
 from src.db import _get_secret  
 
-MODEL_NAME = "gemini-2.0-flash"
+MODEL_NAME = "gemini-3.6-flash"
 
 _SYSTEM_PROMPT = """You are a supply-chain analyst summarizing delivery KPIs \
 for a Brazilian e-commerce operations team.
@@ -37,21 +34,29 @@ def _get_client() -> genai.Client:
 
 
 def generate_insights(kpis: dict[str, Any]) -> dict:
+    """
+    Summarize a dict of delivery KPIs into plain-English bullets plus a risk
+    flag, using Gemini's Interactions API. Returns
+    {"bullets": [str, ...], "risk_flag": str | None}.
+
+    Raises RuntimeError if GEMINI_API_KEY is missing or Gemini's response
+    can't be parsed as the expected JSON shape. Any underlying SDK/network
+    error is left to propagate as-is so callers can distinguish "not
+    configured" from "request failed".
+    """
     client = _get_client()
 
     prompt = f"KPIs:\n{json.dumps(kpis, indent=2, default=str)}"
 
-    response = client.models.generate_content(
+    interaction = client.interactions.create(
         model=MODEL_NAME,
-        contents=prompt,
-        config=types.GenerateContentConfig(
-            system_instruction=_SYSTEM_PROMPT,
-            response_mime_type="application/json",
-            temperature=0.2,
-        ),
+        input=prompt,
+        system_instruction=_SYSTEM_PROMPT,
+        response_format={"type": "text", "mime_type": "application/json"},
+        generation_config={"temperature": 0.2},
     )
 
-    raw_text = (response.text or "").strip()
+    raw_text = (interaction.output_text or "").strip()
     if not raw_text:
         raise RuntimeError("Gemini returned an empty response.")
 
