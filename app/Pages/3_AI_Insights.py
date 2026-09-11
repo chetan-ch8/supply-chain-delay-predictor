@@ -1,4 +1,3 @@
-
 import sys
 from pathlib import Path
 
@@ -22,7 +21,9 @@ def load_kpis() -> dict:
     avg_delay = round(
         (state_df["avg_delay_days"] * state_df["total_orders"]).sum() / total_orders, 1
     )
-    worst_state_row = state_df.sort_values("on_time_rate_pct").iloc[0]
+    state_sorted = state_df.sort_values("on_time_rate_pct")
+    worst_state_row = state_sorted.iloc[0]
+    best_state_row = state_sorted.iloc[-1]
 
     trend_sorted = trend_df.sort_values("month")
     if len(trend_sorted) >= 2:
@@ -37,8 +38,13 @@ def load_kpis() -> dict:
         "avg_delay_days": avg_delay,
         "worst_state": worst_state_row["customer_state"],
         "worst_state_on_time_pct": worst_state_row["on_time_rate_pct"],
+        "best_state": best_state_row["customer_state"],
+        "best_state_on_time_pct": best_state_row["on_time_rate_pct"],
         "total_orders": total_orders,
         "late_rate_trend": trend_desc,
+        "state_summary": state_sorted[
+            ["customer_state", "on_time_rate_pct", "total_orders"]
+        ].to_dict(orient="records"),
     }
 
 
