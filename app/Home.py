@@ -52,7 +52,8 @@ def main():
     col1.metric("Overall On-Time Rate", f"{overall_on_time_pct}%")
     col2.metric("Avg Delivery Delay", f"{avg_delay} days")
     col3.metric("Worst-Performing State", worst_state,
-                f"{worst_state_row['on_time_rate_pct']}% on-time")
+                f"{worst_state_row['on_time_rate_pct']}% on-time",
+                delta_color="off")
     col4.metric("Total Orders Analyzed", f"{total_orders:,}")
 
     st.divider()
